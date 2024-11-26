@@ -1,0 +1,37 @@
+name: ASP.NET Deploy to IIS
+
+on:
+   push:
+     branches:
+        - master
+  # pull_request:
+  #   branches:
+  #     - publish_Branch
+ 
+jobs:
+  build-and-deploy:
+    runs-on: self-hosted
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Setup ASP.NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: '9.0.x'
+
+    - name: Build with dotnet
+      shell: cmd
+      run: dotnet build --configuration Release
+
+    - name: Publish with dotnet
+      shell: cmd
+      run: | 
+        dotnet publish --configuration Release --output "C:\Users\nares\Documents\BOOKGA\ReadBook"
+
+    - name: Deploy to IIS
+      shell: cmd
+      run: |
+        iisreset /stop
+        xcopy /s /y "C:\Users\nares\Documents\BOOKGA\ReadBook\*" "C:\IISPublish\ReadBook.com"
+        iisreset /start
