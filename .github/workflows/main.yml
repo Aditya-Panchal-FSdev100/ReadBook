@@ -20,7 +20,10 @@ jobs:
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: '9.0.x'
-
+        
+   # Add NuGet restore step
+    - name: Restore NuGet packages
+      run: dotnet restore
     - name: Build with dotnet
       shell: cmd
       run: dotnet build --configuration Release
