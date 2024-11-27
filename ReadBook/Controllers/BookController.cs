@@ -19,7 +19,7 @@ namespace ReadBook.Controllers
             {
                 Id = 1,
                 Title = "Helloo World",
-                Author = "C#",
+                Author = "CEE#",
                 Created = DateTime.Now,
             };
             return Request.CreateResponse(HttpStatusCode.OK, book);
