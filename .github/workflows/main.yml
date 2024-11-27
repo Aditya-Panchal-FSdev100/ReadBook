@@ -48,6 +48,8 @@ jobs:
         # Get the most recent modification date in the IIS bin
         $latestIisFile = Get-ChildItem -Path $iisBin -Recurse | Sort-Object LastWriteTime -Descending | Select-Object -First 1
         $latestIisDate = $latestIisFile.LastWriteTime
+        
+        Write-Host $latestLocalFile
         Write-Host $latestIisFile
         Write-Host $latestIisDate
         #debug
