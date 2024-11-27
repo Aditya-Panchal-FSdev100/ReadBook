@@ -18,8 +18,8 @@ namespace ReadBook.Controllers
             Book book = new Book
             {
                 Id = 1,
-                Title = "Helloo World",
-                Author = "CEE#",
+                Title = "Hello World",
+                Author = "C#darbari",
                 Created = DateTime.Now,
             };
             return Request.CreateResponse(HttpStatusCode.OK, book);
