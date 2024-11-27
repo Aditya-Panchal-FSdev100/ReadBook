@@ -25,8 +25,7 @@ jobs:
         echo "in the GitHub Actions workflow"
 
     - name: Restore NuGet packages
-      run: |
-        nuget restore "C:\Users\nares\Documents\IIS Github Configuration\actions-runner\_work\ReadBook\ReadBook\ReadBook\ReadBook.csproj"
+      run: dotnet restore
 
     
     - name: Restore NuGet packages (Force)
