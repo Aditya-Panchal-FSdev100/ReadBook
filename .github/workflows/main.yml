@@ -31,44 +31,53 @@ jobs:
       run: |
         # Stop IIS
         iisreset /stop
-        
-        # Define the local and IIS bin directories
-        $localBin = 'C:\Users\nares\Documents\BOOKGA\ReadBook\bin'
-        $iisBin = 'C:\IISPublish\ReadBook.com\bin'
-        
-        # Ensure IIS bin directory exists
-        if (!(Test-Path $iisBin)) {
-            New-Item -ItemType Directory -Force -Path $iisBin
-        }
-        
-        # Get the most recent modification date in the local bin
-        $latestLocalFile = Get-ChildItem -Path $localBin -Recurse | Sort-Object LastWriteTime -Descending | Select-Object -First 1
-        $latestLocalDate = $latestLocalFile.LastWriteTime
-        
-        # Get the most recent modification date in the IIS bin
-        $latestIisFile = Get-ChildItem -Path $iisBin -Recurse | Sort-Object LastWriteTime -Descending | Select-Object -First 1
-        $latestIisDate = $latestIisFile.LastWriteTime
-        
-        Write-Host $latestLocalFile
-        Write-Host $latestIisFile
-        Write-Host $latestIisDate
-        #debug
-        Write-Host $latestLocalDate
-        Write-Host $latestIisDate
-        # Check for mismatch and copy files if the local bin has newer files
-        if ($latestLocalDate -gt $latestIisDate) {
-            $filesToCopy = Get-ChildItem -Path $localBin -Recurse | Where-Object { $_.LastWriteTime -gt $latestIisDate }
-            foreach ($file in $filesToCopy) {
-                $destinationFile = $file.FullName.Replace($localBin, $iisBin)
-                Write-Host "Copying file: $file.FullName to $destinationFile"
-                xcopy $file.FullName $destinationFile /s /y
-            }
-            Write-Host "Newer files have been copied to IIS bin."
-        } else {
-            Write-Host "No newer files to copy."
-        }
-        
-        # Start IIS
-        iisreset /start
+              
+            # Define the local and IIS bin directories
+          $localBin = 'C:\Users\nares\Documents\BOOKGA\ReadBook\bin'
+          $iisBin = 'C:\IISPublish\ReadBook.com\bin'
+          
+          # Ensure IIS bin directory exists
+          if (!(Test-Path $iisBin)) {
+              New-Item -ItemType Directory -Force -Path $iisBin
+          }
+          
+          # Get the most recent modification date in the local bin (only files)
+          $latestLocalFile = Get-ChildItem -Path $localBin -Recurse -File | Sort-Object LastWriteTime -Descending | Select-Object -First 1
+          $latestLocalDate = $latestLocalFile.LastWriteTime
+          
+          # Get the most recent modification date in the IIS bin (only files)
+          $latestIisFile = Get-ChildItem -Path $iisBin -Recurse -File | Sort-Object LastWriteTime -Descending | Select-Object -First 1
+          $latestIisDate = $latestIisFile.LastWriteTime
+          
+          # Display the latest files and their modification times
+          Write-Host "Latest local file: $($latestLocalFile.FullName) with modification date: $latestLocalDate"
+          Write-Host "Latest IIS file: $($latestIisFile.FullName) with modification date: $latestIisDate"
+          
+          # Debug - Print out the dates for comparison
+          Write-Host "Local bin most recent modification date: $latestLocalDate"
+          Write-Host "IIS bin most recent modification date: $latestIisDate"
+          
+          # Check for mismatch and copy files if the local bin has newer files
+          if ($latestLocalDate -gt $latestIisDate) {
+              # Get the list of files modified after the IIS bin files' modification date
+              $filesToCopy = Get-ChildItem -Path $localBin -Recurse -File | Where-Object { $_.LastWriteTime -gt $latestIisDate }
+              
+              foreach ($file in $filesToCopy) {
+                  $destinationFile = $file.FullName.Replace($localBin, $iisBin)
+                  
+                  # Make sure the destination directory exists
+                  $destinationDir = [System.IO.Path]::GetDirectoryName($destinationFile)
+                  if (-not (Test-Path $destinationDir)) {
+                      New-Item -ItemType Directory -Force -Path $destinationDir
+                  }
+          
+                  Write-Host "Copying file: $($file.FullName) to $destinationFile"
+                  xcopy $file.FullName $destinationFile /s /y
+              }
+              Write-Host "Newer files have been copied to IIS bin."
+          } else {
+              Write-Host "No newer files to copy."
+          }
 
+        # Start IIS
         iisreset /start
