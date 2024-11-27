@@ -45,5 +45,31 @@ jobs:
     - name: Deploy to IIS
       run: |
         iisreset /stop
-        xcopy /s /y "C:\Users\nares\Documents\BOOKGA\ReadBook\*" "C:\IISPublish\ReadBook.com"
+         powershell -Command "
+        $localBin = 'C:\Users\nares\Documents\BOOKGA\ReadBook\bin'
+        $iisBin = 'C:\IISPublish\ReadBook.com\bin'
+
+        # Ensure IIS bin directory exists
+        if (!(Test-Path $iisBin)) {
+            New-Item -ItemType Directory -Force -Path $iisBin
+        }
+
+        # Get today's date
+        $today = (Get-Date).Date
+
+        # Get the list of files modified today
+        $filesToCopy = Get-ChildItem -Path $localBin -Recurse | Where-Object { $_.LastWriteTime.Date -eq $today }
+
+        # Copy files modified today from local bin to IIS bin using xcopy
+        foreach ($file in $filesToCopy) {
+            $sourceFile = $file.FullName
+            $destinationFile = $iisBin + '\' + $file.Name
+
+            # Use xcopy to copy the file, overwriting if it exists
+            Write-Host 'Copying file: ' $sourceFile
+            xcopy $sourceFile $destinationFile /Y
+        }
+
+        Write-Host 'Files modified today have been copied to IIS bin.'
+        "
         iisreset /start
