@@ -16,9 +16,14 @@ jobs:
     - name: Set up .NET
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: '6.0.x'
+        dotnet-version: '9.0.x'
 
-    # Restore NuGet packages (Force) using NuGet CLI
+    - name: Run script
+      run: |
+        echo "This is a multiline"
+        echo "command block"
+        echo "in the GitHub Actions workflow"
+
     - name: Restore NuGet packages
       run: |
         nuget restore "C:\Users\nares\Documents\IIS Github Configuration\actions-runner\_work\ReadBook\ReadBook\ReadBook\ReadBook.csproj"
@@ -27,6 +32,11 @@ jobs:
     - name: Restore NuGet packages (Force)
       run: dotnet restore --force
 
+
+    - name: Run script
+      run: |
+        echo "End"
+        
     - name: Build with dotnet
       run: dotnet build --configuration Release
 
