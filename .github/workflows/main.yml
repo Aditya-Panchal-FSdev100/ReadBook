@@ -33,7 +33,7 @@ jobs:
         iisreset /stop
               
             # Define the local and IIS bin directories
-          $localBin = 'C:\Users\nares\Documents\BOOKGA\ReadBook\bin'
+          $localBin = 'C:\Users\nares\Documents\IIS Github Configuration\actions-runner\_work\ReadBook\ReadBook\ReadBook\bin'
           $iisBin = 'C:\IISPublish\ReadBook.com\bin'
           
           # Ensure IIS bin directory exists
