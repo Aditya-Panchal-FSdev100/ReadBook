@@ -48,7 +48,11 @@ jobs:
         # Get the most recent modification date in the IIS bin
         $latestIisFile = Get-ChildItem -Path $iisBin -Recurse | Sort-Object LastWriteTime -Descending | Select-Object -First 1
         $latestIisDate = $latestIisFile.LastWriteTime
-        
+        Write-Host $latestIisFile
+        Write-Host $latestIisDate
+        #debug
+        Write-Host $latestLocalDate
+        Write-Host $latestIisDate
         # Check for mismatch and copy files if the local bin has newer files
         if ($latestLocalDate -gt $latestIisDate) {
             $filesToCopy = Get-ChildItem -Path $localBin -Recurse | Where-Object { $_.LastWriteTime -gt $latestIisDate }
