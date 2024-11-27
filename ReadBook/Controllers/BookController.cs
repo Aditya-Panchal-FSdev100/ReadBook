@@ -18,7 +18,7 @@ namespace ReadBook.Controllers
             Book book = new Book
             {
                 Id = 1,
-                Title = "Hello World from API",
+                Title = "Hello World",
                 Author = "C# Book",
                 Created = DateTime.Now,
             };
