@@ -29,31 +29,36 @@ jobs:
 
     - name: Deploy to IIS
       run: |
-        iisreset /stop
-        powershell -Command "
-        $localBin = 'C:\Users\nares\Documents\BOOKGA\ReadBook\bin'
-        $iisBin = 'C:\IISPublish\ReadBook.com\bin'
+        # Stop IIS
+          iisreset /stop
+          
+          # Define the local and IIS bin directories
+          $localBin = 'C:\Users\nares\Documents\BOOKGA\ReadBook\bin'
+          $iisBin = 'C:\IISPublish\ReadBook.com\bin'
+          
+          # Ensure IIS bin directory exists
+          if (!(Test-Path $iisBin)) {
+              New-Item -ItemType Directory -Force -Path $iisBin
+          }
+          
+          # Get the list of files from the local bin and IIS bin
+          $localFiles = Get-ChildItem -Path $localBin -Recurse
+          $iisFiles = Get-ChildItem -Path $iisBin -Recurse
+          
+          # Compare and copy files
+          foreach ($localFile in $localFiles) {
+              # Get the corresponding file in IIS bin
+              $relativePath = $localFile.FullName.Substring($localBin.Length)
+              $iisFilePath = Join-Path $iisBin $relativePath
+              $iisFile = Get-Item -Path $iisFilePath -ErrorAction SilentlyContinue
+              
+              # If the IIS file doesn't exist or the local file is newer, copy it using xcopy
+              if ($iisFile -eq $null -or $localFile.LastWriteTime -gt $iisFile.LastWriteTime) {
+                  Write-Host "Copying file: $localFile.FullName to $iisFilePath"
+                  xcopy $localFile.FullName $iisFilePath /s /y
+              }
+          }
+          
+          Write-Host 'Modified files have been copied to IIS bin.'
 
-        # Ensure IIS bin directory exists
-        if (!(Test-Path $iisBin)) {
-            New-Item -ItemType Directory -Force -Path $iisBin
-        }
-
-        # Get today's date
-        $today = (Get-Date).Date
-
-        # Get the list of files modified today
-        $filesToCopy = Get-ChildItem -Path $localBin -Recurse | Where-Object { $_.LastWriteTime.Date -eq $today }
-
-        # Copy files modified today from local bin to IIS bin using xcopy
-        foreach ($file in $filesToCopy) {
-            $sourceFile = $file.FullName
-            $destinationFile = Join-Path $iisBin $file.Name
-
-            # Use xcopy to copy the file, overwriting if it exists
-            Write-Host 'Copying file: ' $sourceFile
-            xcopy $sourceFile $destinationFile /Y
-        }
-        Write-Host 'Files modified today have been copied to IIS bin.'
-        "
         iisreset /start
