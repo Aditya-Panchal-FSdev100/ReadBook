@@ -18,24 +18,9 @@ jobs:
       with:
         dotnet-version: '9.0.x'
 
-    - name: Run script
-      run: |
-        echo "This is a multiline"
-        echo "command block"
-        echo "in the GitHub Actions workflow"
-
     - name: Restore NuGet packages
       run: dotnet restore
 
-    
-    - name: Restore NuGet packages (Force)
-      run: dotnet restore --force
-
-
-    - name: Run script
-      run: |
-        echo "End"
-        
     - name: Build with dotnet
       run: dotnet build --configuration Release
 
@@ -45,7 +30,7 @@ jobs:
     - name: Deploy to IIS
       run: |
         iisreset /stop
-         powershell -Command "
+        powershell -Command "
         $localBin = 'C:\Users\nares\Documents\BOOKGA\ReadBook\bin'
         $iisBin = 'C:\IISPublish\ReadBook.com\bin'
 
@@ -63,13 +48,12 @@ jobs:
         # Copy files modified today from local bin to IIS bin using xcopy
         foreach ($file in $filesToCopy) {
             $sourceFile = $file.FullName
-            $destinationFile = $iisBin + '\' + $file.Name
+            $destinationFile = Join-Path $iisBin $file.Name
 
             # Use xcopy to copy the file, overwriting if it exists
             Write-Host 'Copying file: ' $sourceFile
             xcopy $sourceFile $destinationFile /Y
         }
-
         Write-Host 'Files modified today have been copied to IIS bin.'
         "
         iisreset /start
