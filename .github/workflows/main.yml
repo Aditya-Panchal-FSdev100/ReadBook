@@ -18,7 +18,12 @@ jobs:
       with:
         dotnet-version: '6.0.x'
 
-    # Force restore to ensure all packages are retrieved
+    # Restore NuGet packages (Force) using NuGet CLI
+    - name: Restore NuGet packages
+      run: |
+        nuget restore "C:\Users\nares\Documents\IIS Github Configuration\actions-runner\_work\ReadBook\ReadBook\ReadBook\ReadBook.csproj"
+
+    # Force restore to ensure all packages are retrieved (optional, just to be sure)
     - name: Restore NuGet packages (Force)
       run: dotnet restore --force
 
